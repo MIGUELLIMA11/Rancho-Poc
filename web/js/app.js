@@ -219,7 +219,11 @@ async function updateDashboard() {
 
   // Badges sidebar
   document.getElementById('badge-freelancers').textContent = freelancers.length;
-  document.getElementById('badge-escala').textContent = escalas.filter(e => e.status === 'pendente').length;
+  // Conta escalas futuras (de hoje em diante) que não foram canceladas
+  const hojeBadge = new Date().toISOString().slice(0, 10);
+  document.getElementById('badge-escala').textContent = escalas.filter(e =>
+    e.status !== 'cancelado' && (e.data || '') >= hojeBadge
+  ).length;
 
   // Próximas escalas (próximas 5)
   const hoje = new Date().toISOString().slice(0, 10);
