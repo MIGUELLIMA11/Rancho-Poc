@@ -4,6 +4,7 @@ import sptech.school.projeto_rancho.security.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -76,6 +77,7 @@ public class SecurityConfig {
 
             // 4. Autorização de endpoints
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()  // preflight CORS
                 .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                 .anyRequest().authenticated()
             )

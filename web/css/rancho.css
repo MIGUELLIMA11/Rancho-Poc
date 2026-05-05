@@ -1035,11 +1035,13 @@ button { cursor: pointer; font-family: var(--font-sans); }
 /* ── CEP Status ── */
 .cep-status {
   font-size: 0.76rem;
-  height: 16px;
+  min-height: 18px;
   display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-top: 4px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 4px;
+  margin-top: 6px;
+  line-height: 1.4;
 }
 .cep-status.loading { color: var(--warning); }
 .cep-status.success { color: var(--success); }
