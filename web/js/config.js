@@ -17,7 +17,7 @@
 // ── URL do backend em produção — ALTERE AQUI ─────────────────
 // Exemplo Render:  'https://projeto-rancho.onrender.com/api'
 // Exemplo Railway: 'https://projeto-rancho.up.railway.app/api'
-const PRODUCTION_API_URL = 'https://rancho-poc.onrender.com/api';
+const PRODUCTION_API_URL = 'https://rancho-comanche-api.onrender.com/api';
 
 // ── Detecção automática de ambiente ──────────────────────────
 const _isLocal = ['localhost', '127.0.0.1', ''].includes(window.location.hostname);
