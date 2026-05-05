@@ -1,0 +1,31 @@
+# Maven
+backend/**/target/
+backend/**/*.class
+backend/**/*.jar
+backend/**/*.war
+
+# H2 Database files
+**/*.db
+**/*.mv.db
+**/*.trace.db
+
+# IntelliJ IDEA
+.idea/
+**/.idea/
+*.iml
+*.iws
+*.ipr
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Node (se usar alguma ferramenta)
+node_modules/

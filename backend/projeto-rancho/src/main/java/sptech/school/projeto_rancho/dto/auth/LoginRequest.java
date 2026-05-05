@@ -1,0 +1,21 @@
+package sptech.school.projeto_rancho.dto.auth;
+
+import jakarta.validation.constraints.NotBlank;
+
+/**
+ * Caminho: src/main/java/com/rancho/api/dto/auth/LoginRequest.java
+ */
+public class LoginRequest {
+
+    @NotBlank(message = "E-mail é obrigatório")
+    private String email;
+
+    @NotBlank(message = "Senha é obrigatória")
+    private String senha;
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getSenha() { return senha; }
+    public void setSenha(String senha) { this.senha = senha; }
+}
