@@ -1,27 +1,28 @@
 // =============================================
-// CEP → ENDEREÇO (ViaCEP - Gratuita, sem chave)
+// CEP → ENDEREÇO (BrasilAPI primária, ViaCEP fallback)
+// BrasilAPI tem CORS aberto para qualquer origem
 // =============================================
 
-async function buscarEnderecoPorCep(cep) {
-    // Remove traços e espaços do CEP
-    const cepLimpo = cep.replace(/\D/g, '');
-
-    if (cepLimpo.length !== 8) {
-        throw new Error('CEP inválido. Deve conter 8 dígitos.');
-    }
-
-    const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
-
-    if (!response.ok) {
-        throw new Error('Erro ao consultar o CEP.');
-    }
-
+async function _buscarViaBrasilAPI(cepLimpo) {
+    const response = await fetch(`https://brasilapi.com.br/api/cep/v1/${cepLimpo}`);
+    if (!response.ok) throw new Error('BrasilAPI: CEP não encontrado.');
     const data = await response.json();
+    return {
+        cep: data.cep,
+        logradouro: data.street  || '',
+        bairro:     data.neighborhood || '',
+        cidade:     data.city,
+        estado:     data.state,
+        ibge:       data.ibge || '',
+        enderecoCompleto: `${data.street || ''}, ${data.neighborhood || ''}, ${data.city} - ${data.state}`.replace(/^, /, '')
+    };
+}
 
-    if (data.erro) {
-        throw new Error('CEP não encontrado.');
-    }
-
+async function _buscarViaViaCEP(cepLimpo) {
+    const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+    if (!response.ok) throw new Error('ViaCEP: Erro ao consultar.');
+    const data = await response.json();
+    if (data.erro) throw new Error('CEP não encontrado.');
     return {
         cep: data.cep,
         logradouro: data.logradouro,
@@ -31,6 +32,21 @@ async function buscarEnderecoPorCep(cep) {
         ibge: data.ibge,
         enderecoCompleto: `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`
     };
+}
+
+async function buscarEnderecoPorCep(cep) {
+    const cepLimpo = cep.replace(/\D/g, '');
+
+    if (cepLimpo.length !== 8) {
+        throw new Error('CEP inválido. Deve conter 8 dígitos.');
+    }
+
+    try {
+        return await _buscarViaBrasilAPI(cepLimpo);
+    } catch (_) {
+        // Fallback para ViaCEP
+        return await _buscarViaViaCEP(cepLimpo);
+    }
 }
 
 // =============================================
@@ -46,12 +62,11 @@ async function buscarCoordenadasPorEndereco(enderecoCompleto, cidade, estado, ce
     if (cep) {
         try {
             const cepLimpo = cep.replace(/\D/g, '');
-            const res = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
-            const dados = await res.json();
+            const dados = await buscarEnderecoPorCep(cepLimpo);
 
-            if (!dados.erro) {
-                cidade = dados.localidade;
-                estado = dados.uf;
+            if (dados) {
+                cidade = dados.cidade;
+                estado = dados.estado;
                 const bairro = dados.bairro;
                 const logradouro = dados.logradouro;
 
