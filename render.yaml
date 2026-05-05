@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: rancho-comanche-api
+    runtime: java
+    rootDir: backend/projeto-rancho
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -jar target/projeto_rancho-1.0.0.jar
+    plan: free
+    healthCheckPath: /actuator/health
+
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true          # Render gera automaticamente um valor seguro
+
+      - key: H2_CONSOLE_ENABLED
+        value: "false"               # Desabilitado em produção
+
+      - key: APP_FRONTEND_URL
+        value: https://miguellima11.github.io/Rancho-Poc
