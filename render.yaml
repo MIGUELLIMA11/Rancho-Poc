@@ -4,7 +4,7 @@ services:
     runtime: java
     rootDir: backend/projeto-rancho
     buildCommand: ./mvnw clean package -DskipTests
-    startCommand: java -jar target/projeto_rancho-1.0.0.jar
+    startCommand: java -jar target/projeto-rancho-0.0.1-SNAPSHOT.jar
     plan: free
     healthCheckPath: /actuator/health
 
