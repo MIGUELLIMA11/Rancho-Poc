@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rancho Comanche — Recuperar Senha</title>
+  <link rel="stylesheet" href="../css/rancho.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body class="auth-page">
+
+  <div class="auth-split">
+
+    <!-- ── Brand Side ── -->
+    <div class="auth-brand">
+      <div class="brand-content">
+        <span class="brand-icon">🔑</span>
+        <h1>Recuperar Acesso</h1>
+        <p>Não se preocupe! Vamos te ajudar a recuperar o acesso ao Rancho Comanche em poucos passos.</p>
+        <div class="brand-features">
+          <div class="brand-feature">
+            <span class="brand-feature-icon">📧</span>
+            <span>Código enviado por e-mail</span>
+          </div>
+          <div class="brand-feature">
+            <span class="brand-feature-icon">🔐</span>
+            <span>Nova senha segura</span>
+          </div>
+          <div class="brand-feature">
+            <span class="brand-feature-icon">✅</span>
+            <span>Acesso restaurado em minutos</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Form Side ── -->
+    <div class="auth-form-side">
+      <div class="auth-card">
+
+        <div class="auth-logo-sm">
+          <span class="logo-icon">🤠</span>
+          <span class="logo-text">Rancho Comanche</span>
+        </div>
+
+        <h2>Recuperar senha</h2>
+        <p class="auth-subtitle">Siga os passos abaixo para redefinir sua senha.</p>
+
+        <!-- ── Steps Indicator ── -->
+        <div class="steps">
+          <div class="step active" id="step-dot-1">
+            <div class="step-num" id="step-num-1">1</div>
+            <span class="step-label">E-mail</span>
+          </div>
+          <div class="step" id="step-dot-2">
+            <div class="step-num" id="step-num-2">2</div>
+            <span class="step-label">Código</span>
+          </div>
+          <div class="step" id="step-dot-3">
+            <div class="step-num" id="step-num-3">3</div>
+            <span class="step-label">Nova senha</span>
+          </div>
+        </div>
+
+        <div id="alert-box" class="alert hidden"></div>
+
+        <!-- ── Step 1: E-mail ── -->
+        <div class="step-view active" id="view-step-1">
+          <p style="font-size:0.88rem; color:var(--text-light); margin-bottom:20px;">
+            Informe o e-mail cadastrado e enviaremos um código de verificação.
+          </p>
+          <form id="form-step-1" novalidate>
+            <div class="form-group">
+              <label for="email-rec">E-mail <span class="req">*</span></label>
+              <input type="email" id="email-rec" placeholder="seu@email.com" required />
+              <span class="field-error">Informe um e-mail válido.</span>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full btn-lg" id="btn-step-1">
+              <span id="btn-s1-text">Enviar código</span>
+              <span id="btn-s1-spinner" class="spinner hidden"></span>
+            </button>
+          </form>
+        </div>
+
+        <!-- ── Step 2: Código ── -->
+        <div class="step-view" id="view-step-2">
+          <p style="font-size:0.88rem; color:var(--text-light); margin-bottom:8px;">
+            Enviamos um código de 6 dígitos para <strong id="email-shown" style="color:var(--text-mid);"></strong>.
+          </p>
+          <p style="font-size:0.82rem; color:var(--text-light); margin-bottom:24px;">
+            Verifique também sua caixa de spam.
+          </p>
+          <form id="form-step-2" novalidate>
+            <div class="form-group">
+              <label for="codigo">Código de verificação <span class="req">*</span></label>
+              <input type="text" id="codigo" placeholder="000000" maxlength="6"
+                     style="letter-spacing:0.25em; font-size:1.3rem; text-align:center; font-weight:700;" required />
+              <span class="field-error">Informe o código de 6 dígitos.</span>
+              <p class="hint">Não recebeu? <a href="#" onclick="reenviarCodigo(event)" style="color:var(--primary); font-weight:600;">Reenviar código</a></p>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <button type="button" class="btn btn-ghost btn-full" onclick="goStep(1)">
+                <i class="fa fa-arrow-left"></i> Voltar
+              </button>
+              <button type="submit" class="btn btn-primary btn-full btn-lg" id="btn-step-2">
+                <span id="btn-s2-text">Verificar</span>
+                <span id="btn-s2-spinner" class="spinner hidden"></span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- ── Step 3: Nova Senha ── -->
+        <div class="step-view" id="view-step-3">
+          <p style="font-size:0.88rem; color:var(--text-light); margin-bottom:24px;">
+            Escolha uma nova senha segura para sua conta.
+          </p>
+          <form id="form-step-3" novalidate>
+            <div class="form-group">
+              <label for="nova-senha">Nova senha <span class="req">*</span></label>
+              <div class="input-eye">
+                <input type="password" id="nova-senha" placeholder="Mínimo 6 caracteres" required />
+                <button type="button" class="btn-eye" onclick="toggleEye('nova-senha', this)">
+                  <i class="fa fa-eye"></i>
+                </button>
+              </div>
+              <span class="field-error">A senha deve ter pelo menos 6 caracteres.</span>
+            </div>
+            <div class="form-group">
+              <label for="confirmar-nova-senha">Confirmar nova senha <span class="req">*</span></label>
+              <div class="input-eye">
+                <input type="password" id="confirmar-nova-senha" placeholder="Repita a senha" required />
+                <button type="button" class="btn-eye" onclick="toggleEye('confirmar-nova-senha', this)">
+                  <i class="fa fa-eye"></i>
+                </button>
+              </div>
+              <span class="field-error">As senhas não coincidem.</span>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <button type="button" class="btn btn-ghost btn-full" onclick="goStep(2)">
+                <i class="fa fa-arrow-left"></i> Voltar
+              </button>
+              <button type="submit" class="btn btn-primary btn-full btn-lg" id="btn-step-3">
+                <span id="btn-s3-text">Redefinir senha</span>
+                <span id="btn-s3-spinner" class="spinner hidden"></span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- ── Step 4: Sucesso ── -->
+        <div class="step-view" id="view-success" style="text-align:center;">
+          <div style="font-size:3.5rem; margin-bottom:16px;">🎉</div>
+          <h3 style="font-size:1.25rem; font-weight:700; color:var(--text); margin-bottom:8px;">Senha redefinida!</h3>
+          <p style="font-size:0.88rem; color:var(--text-light); margin-bottom:28px;">
+            Sua senha foi alterada com sucesso. Você já pode fazer login com a nova senha.
+          </p>
+          <a href="index.html" class="btn btn-primary btn-full btn-lg">
+            <i class="fa fa-sign-in-alt"></i> Ir para o Login
+          </a>
+        </div>
+
+        <div class="auth-footer" id="back-link">
+          <p><a href="index.html" style="color:var(--primary); font-weight:600;">
+            <i class="fa fa-arrow-left"></i> Voltar para o Login
+          </a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/auth.js"></script>
+  <script>
+    let currentStep = 1;
+    let recoveryEmail = '';
+    // Código simulado para demo (em produção, viria do backend)
+    let expectedCode  = '';
+
+    // ── Step 1: Enviar E-mail ──
+    document.getElementById('form-step-1').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email-rec').value.trim();
+
+      if (!isValidEmail(email)) { setFieldError('email-rec', true); return; }
+      setFieldError('email-rec', false);
+      clearAlert();
+      setStepLoading(1, true);
+
+      try {
+        await AuthService.sendRecoveryEmail(email);
+        recoveryEmail = email;
+        document.getElementById('email-shown').textContent = email;
+        goStep(2);
+      } catch (err) {
+        showAlert(err.message || 'Erro ao enviar o código. Verifique o e-mail e tente novamente.', 'error');
+      } finally {
+        setStepLoading(1, false);
+      }
+    });
+
+    // ── Step 2: Verificar Código ──
+    document.getElementById('form-step-2').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const codigo = document.getElementById('codigo').value.trim();
+
+      if (codigo.length !== 6) { setFieldError('codigo', true); return; }
+      setFieldError('codigo', false);
+      clearAlert();
+      setStepLoading(2, true);
+
+      try {
+        await AuthService.verifyCode(recoveryEmail, codigo);
+        goStep(3);
+      } catch (err) {
+        showAlert(err.message || 'Código inválido ou expirado.', 'error');
+      } finally {
+        setStepLoading(2, false);
+      }
+    });
+
+    // ── Step 3: Nova Senha ──
+    document.getElementById('form-step-3').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const novaSenha    = document.getElementById('nova-senha').value;
+      const confirmarSenha = document.getElementById('confirmar-nova-senha').value;
+      let valid = true;
+
+      if (novaSenha.length < 6)          { setFieldError('nova-senha', true);         valid = false; } else setFieldError('nova-senha', false);
+      if (novaSenha !== confirmarSenha)  { setFieldError('confirmar-nova-senha', true); valid = false; } else setFieldError('confirmar-nova-senha', false);
+
+      if (!valid) return;
+      clearAlert();
+      setStepLoading(3, true);
+
+      try {
+        await AuthService.resetPassword(recoveryEmail, novaSenha);
+        // Sucesso: mostra tela de sucesso
+        document.querySelectorAll('.step-view').forEach(v => v.classList.remove('active'));
+        document.getElementById('view-success').classList.add('active');
+        document.getElementById('back-link').classList.add('hidden');
+        markAllDone();
+      } catch (err) {
+        showAlert(err.message || 'Erro ao redefinir senha. Tente novamente.', 'error');
+      } finally {
+        setStepLoading(3, false);
+      }
+    });
+
+    async function reenviarCodigo(e) {
+      e.preventDefault();
+      if (!recoveryEmail) return;
+      try {
+        await AuthService.sendRecoveryEmail(recoveryEmail);
+        showAlert('Código reenviado com sucesso!', 'success');
+      } catch(err) {
+        showAlert('Não foi possível reenviar o código.', 'error');
+      }
+    }
+
+    function goStep(n) {
+      clearAlert();
+      document.querySelectorAll('.step-view').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-step-' + n).classList.add('active');
+
+      for (let i = 1; i <= 3; i++) {
+        const dot = document.getElementById('step-dot-' + i);
+        dot.classList.remove('active', 'done');
+        if (i < n)  dot.classList.add('done');
+        if (i === n) dot.classList.add('active');
+      }
+      currentStep = n;
+    }
+
+    function markAllDone() {
+      for (let i = 1; i <= 3; i++) {
+        const dot = document.getElementById('step-dot-' + i);
+        dot.classList.remove('active');
+        dot.classList.add('done');
+        document.getElementById('step-num-' + i).innerHTML = '<i class="fa fa-check" style="font-size:0.75rem;"></i>';
+      }
+    }
+
+    function setStepLoading(step, on) {
+      const btn = document.getElementById('btn-step-' + step);
+      if (!btn) return;
+      btn.disabled = on;
+      document.getElementById('btn-s' + step + '-text').textContent = on ? 'Aguarde...' : ['Enviar código','Verificar','Redefinir senha'][step-1];
+      document.getElementById('btn-s' + step + '-spinner').classList.toggle('hidden', !on);
+    }
+
+    function showAlert(msg, type) {
+      const box = document.getElementById('alert-box');
+      box.className = 'alert alert-' + type;
+      const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+      box.innerHTML = '<i class="fa ' + icon + '"></i> ' + msg;
+    }
+
+    function clearAlert() {
+      const box = document.getElementById('alert-box');
+      box.className = 'alert hidden';
+      box.textContent = '';
+    }
+
+    function setFieldError(id, on) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.closest('.form-group').classList.toggle('has-error', on);
+    }
+
+    function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+    function toggleEye(inputId, btn) {
+      const input = document.getElementById(inputId);
+      const icon  = btn.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    }
+
+    // Só dígitos no campo de código
+    document.getElementById('codigo').addEventListener('input', function () {
+      this.value = this.value.replace(/\D/g, '').slice(0, 6);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rancho Comanche — Login</title>
+  <link rel="stylesheet" href="../css/rancho.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body class="auth-page">
+
+  <div class="auth-split">
+
+    <!-- ── Brand Side ── -->
+    <div class="auth-brand">
+      <div class="brand-content">
+        <span class="brand-icon">🤠</span>
+        <h1>Rancho Comanche</h1>
+        <p>Sistema completo para gestão de freelancers, escala e pagamentos do seu restaurante.</p>
+        <div class="brand-features">
+          <div class="brand-feature">
+            <span class="brand-feature-icon">👥</span>
+            <span>Cadastro e gestão de freelancers</span>
+          </div>
+          <div class="brand-feature">
+            <span class="brand-feature-icon">📅</span>
+            <span>Escalas de trabalho organizadas</span>
+          </div>
+          <div class="brand-feature">
+            <span class="brand-feature-icon">💰</span>
+            <span>Controle de pagamentos e valores</span>
+          </div>
+          <div class="brand-feature">
+            <span class="brand-feature-icon">📍</span>
+            <span>Distância e localização via CEP</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Form Side ── -->
+    <div class="auth-form-side">
+      <div class="auth-card">
+
+        <div class="auth-logo-sm">
+          <span class="logo-icon">🤠</span>
+          <span class="logo-text">Rancho Comanche</span>
+        </div>
+
+        <h2>Bem-vindo de volta!</h2>
+        <p class="auth-subtitle">Faça login para acessar o painel de gestão.</p>
+
+        <div id="alert-box" class="alert hidden"></div>
+
+        <form id="login-form" novalidate>
+
+          <div class="form-group">
+            <label for="email">E-mail <span class="req">*</span></label>
+            <input type="email" id="email" name="email"
+                   placeholder="seu@email.com" autocomplete="email" required />
+            <span class="field-error">Informe um e-mail válido.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Senha <span class="req">*</span></label>
+            <div class="input-eye">
+              <input type="password" id="password" name="password"
+                     placeholder="••••••••" autocomplete="current-password" required />
+              <button type="button" class="btn-eye" onclick="toggleEye('password', this)" title="Ver senha">
+                <i class="fa fa-eye"></i>
+              </button>
+            </div>
+            <span class="field-error">Informe sua senha.</span>
+          </div>
+
+          <div class="form-group" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:24px;">
+            <label class="checkbox-label">
+              <input type="checkbox" id="remember" name="remember" />
+              <span>Lembrar de mim</span>
+            </label>
+            <a href="recuperar-senha.html" class="text-sm" style="color:var(--primary); font-weight:600;">
+              Esqueci minha senha
+            </a>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-full btn-lg" id="btn-login">
+            <span id="btn-login-text">Entrar</span>
+            <span id="btn-login-spinner" class="spinner hidden"></span>
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          <p>Não tem conta?
+            <a href="cadastro.html" style="color:var(--primary); font-weight:600;">
+              Criar cadastro
+            </a>
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/audit.js"></script>
+  <script>
+    // ── Redirect if already logged in ──
+    if (localStorage.getItem('rc_token')) {
+      window.location.href = 'app.html';
+    }
+
+    // ── Pre-fill remembered email ──
+    const remembered = localStorage.getItem('rc_remember');
+    if (remembered) {
+      document.getElementById('email').value = remembered;
+      document.getElementById('remember').checked = true;
+    }
+
+    // ── Login Form Handler ──
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const remember = document.getElementById('remember').checked;
+
+      clearAlert();
+      let valid = true;
+
+      if (!isValidEmail(email)) { setFieldError('email', true); valid = false; }
+      else                       { setFieldError('email', false); }
+
+      if (!password) { setFieldError('password', true); valid = false; }
+      else           { setFieldError('password', false); }
+
+      if (!valid) return;
+
+      setLoading(true);
+
+      try {
+        const result = await AuthService.login(email, password);
+        if (remember) localStorage.setItem('rc_remember', email);
+        localStorage.setItem('rc_token', result.token || 'demo-token');
+        localStorage.setItem('rc_user', JSON.stringify(result.user || { name: email.split('@')[0], role: 'Gestor' }));
+        AuditService.log('LOGIN', { email, modo: result.token?.startsWith('demo') ? 'demo' : 'backend' });
+        showAlert('Login realizado! Redirecionando...', 'success');
+        setTimeout(() => { window.location.href = 'app.html'; }, 700);
+      } catch (err) {
+        showAlert(err.message || 'Usuário ou senha incorretos.', 'error');
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    function setLoading(on) {
+      document.getElementById('btn-login').disabled = on;
+      document.getElementById('btn-login-text').textContent = on ? 'Entrando...' : 'Entrar';
+      document.getElementById('btn-login-spinner').classList.toggle('hidden', !on);
+    }
+
+    function showAlert(msg, type) {
+      const box = document.getElementById('alert-box');
+      box.className = 'alert alert-' + type;
+      const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+      box.innerHTML = '<i class="fa ' + icon + '"></i> ' + msg;
+    }
+
+    function clearAlert() {
+      const box = document.getElementById('alert-box');
+      box.className = 'alert hidden';
+      box.textContent = '';
+    }
+
+    function setFieldError(id, on) {
+      document.getElementById(id).closest('.form-group').classList.toggle('has-error', on);
+    }
+
+    function isValidEmail(e) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+    }
+
+    function toggleEye(inputId, btn) {
+      const input = document.getElementById(inputId);
+      const icon  = btn.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    }
+  </script>
+
+  <script>
+  const linkRecuperar = document.getElementById('link-recuperar');
+
+  if (linkRecuperar) {
+    linkRecuperar.addEventListener('click', async (e) => {
+      e.preventDefault();
+
+      if (!window.supabaseClient) {
+        alert("Erro: Supabase indisponível.");
+        return;
+      }
+
+      const telefone = prompt(
+        "Digite seu WhatsApp cadastrado (apenas números):"
+      );
+
+      if (!telefone) return;
+
+      const telLimpo = telefone.replace(/\D/g, '');
+      const emailFake = `${telLimpo}@shinobi.com`;
+
+      const { error } =
+        await window.supabaseClient.auth.resetPasswordForEmail(emailFake, {
+          redirectTo: `${window.location.origin}/reset.html`
+        });
+
+      if (error) {
+        alert("Erro ao enviar link de recuperação:\n" + error.message);
+      } else {
+        alert(
+          "Link de recuperação enviado!\nVerifique seu e‑mail."
+        );
+      }
+    });
+  }
+</script>
+</body>
+</html>
