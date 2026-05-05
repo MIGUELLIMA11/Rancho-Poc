@@ -1,18 +1,14 @@
 services:
   - type: web
     name: rancho-comanche-api
-    runtime: java
-    rootDir: backend/projeto-rancho
-    buildCommand: chmod +x mvnw && ./mvnw clean package -DskipTests
-    startCommand: java -jar target/projeto-rancho-0.0.1-SNAPSHOT.jar
+    runtime: docker
+    dockerfilePath: backend/projeto-rancho/Dockerfile
+    dockerContext: backend/projeto-rancho
     plan: free
-
     envVars:
       - key: JWT_SECRET
-        generateValue: true          # Render gera automaticamente um valor seguro
-
+        generateValue: true
       - key: H2_CONSOLE_ENABLED
-        value: "false"               # Desabilitado em produção
-
+        value: "false"
       - key: APP_FRONTEND_URL
         value: https://miguellima11.github.io/Rancho-Poc
